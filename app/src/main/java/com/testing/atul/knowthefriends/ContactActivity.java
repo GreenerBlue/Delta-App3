@@ -1,34 +1,47 @@
 package com.testing.atul.knowthefriends;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 public class ContactActivity extends AppCompatActivity {
 
     EditText nameBox ,numberBox;
     Button saveBtn;
+    ImageView icon;
 
     DatabaseWorker dbHelper;
     Intent i;
-    String oldname;
+    int sno; String oldname, imgDecodableString;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
+        setTitle("Edit the contact");
         nameBox = (EditText)findViewById(R.id.nameEt);
         numberBox = (EditText)findViewById(R.id.numberEt);
+        icon = (ImageView)findViewById(R.id.iconIv) ;
         saveBtn = (Button) findViewById(R.id.saveBtn);
 
         i = getIntent();
-        oldname = i.getStringExtra("name");
+        oldname=i.getStringExtra("name");
         nameBox.setText(oldname);
         numberBox.setText(i.getStringExtra("number"));
+        icon.setImageResource(i.getIntExtra("picture", R.mipmap.ic_launcher));
+
+        dbHelper = new DatabaseWorker(getApplicationContext());
+        sno = dbHelper.getSno(oldname);
 
         saveBtn.setOnClickListener(new View.OnClickListener()
         {   @Override
@@ -37,14 +50,19 @@ public class ContactActivity extends AppCompatActivity {
 
             }
         });
+        icon.setOnClickListener(new View.OnClickListener()
+        {   @Override
+            public void onClick(View v)
+            { accessGallery(v); }
+        });
 
     }
 
     public void saveRec(View v){
-        if(oldname != null) {
+        if(sno > 0) {
             try
             {   dbHelper = new DatabaseWorker(getApplicationContext());
-                dbHelper.updateRec(nameBox.getText().toString(), numberBox.getText().toString());
+                dbHelper.updateRec(sno, nameBox.getText().toString(), numberBox.getText().toString());
                 Toast.makeText(getApplicationContext(), "Person Update Successful", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -56,16 +74,59 @@ public class ContactActivity extends AppCompatActivity {
             }
         }
         else {
-            if(dbHelper.insertRec(nameBox.getText().toString(), numberBox.getText().toString())) {
+            try{
+                dbHelper.insertRec(nameBox.getText().toString(), numberBox.getText().toString());
                 Toast.makeText(getApplicationContext(), "Person Inserted", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 }
-            else{
+            catch (SQLException e){
                 Toast.makeText(getApplicationContext(), "Could not Insert person", Toast.LENGTH_SHORT).show();
             }
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
         }
     }
+
+    protected void accessGallery(View v){
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(galleryIntent, 1);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            // When an Image is picked
+            if (requestCode == 1 && resultCode == RESULT_OK
+                    && null != data) {
+                // Get the Image from data
+
+                Uri selectedImage = data.getData();
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+                // Get the cursor
+                Cursor cursor = getContentResolver().query(selectedImage,
+                        filePathColumn, null, null, null);
+                // Move to first row
+                cursor.moveToFirst();
+
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                imgDecodableString = cursor.getString(columnIndex);
+
+                icon.setImageBitmap(BitmapFactory.decodeFile(imgDecodableString));
+
+                cursor.close();
+
+            } else {
+                Toast.makeText(this, "You haven't picked Image",
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+                    .show();
+        }
+
+    }
+
 
 }

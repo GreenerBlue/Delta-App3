@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
     String[] nums;
     ArrayList<String> names1 = new ArrayList<>();
     ArrayList<String> nums1 = new ArrayList<>();
-    Integer[] pics = {R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e,};
+    Integer[] pics = {R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e, R.drawable.a};
 
     DatabaseWorker con = new DatabaseWorker(this);
     SQLiteDatabase condb;
@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(getApplicationContext(), ContactActivity.class);
                 i.putExtra("name", names[position]);
                 i.putExtra( "number", nums[position]);
+                i.putExtra( "picture", pics[position]);
                 startActivity(i);
                 populate();
             }
@@ -50,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
         condb = con.getReadableDatabase();
         Cursor cursor = condb.rawQuery("SELECT * FROM Contacts", null);
         cursor.moveToFirst();
+        int ctr = con.numberOfRows();
 
-        int ctr = 0;
         do{
             String xname = cursor.getString(cursor.getColumnIndex("Name"));
             names1.add(xname);
@@ -66,5 +67,8 @@ public class MainActivity extends AppCompatActivity {
         contactList = (ListView)findViewById(R.id.listView);
         assert contactList != null;
         contactList.setAdapter(adapter);
+
+        condb.close();
+        con.close();
     }
 }

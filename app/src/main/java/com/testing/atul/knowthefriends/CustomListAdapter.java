@@ -36,11 +36,11 @@ public class CustomListAdapter extends ArrayAdapter<String> {
         TextView number = (TextView) rowView.findViewById(R.id.number_list);
 
         name.setText(itemname[position]);
-        photo.setImageResource(imgid[position]);
+        photo.setImageResource(imgid[position%5]);
         number.setText(itemnum[position]);
         return rowView;
 
-    };
+    }
 
 
 }
