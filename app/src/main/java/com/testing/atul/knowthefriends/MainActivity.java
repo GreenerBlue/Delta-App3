@@ -96,16 +96,30 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.add:
+                Intent i1 = new Intent(getApplicationContext(), ContactActivity.class);
+                i1.putExtra("name", "");
+                i1.putExtra("number", "");
+                Bitmap b= BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                b.compress(Bitmap.CompressFormat.PNG, 100, bos);
+                byte[] picSend = bos.toByteArray();
+                i1.putExtra( "picture", picSend);
+                startActivity(i1);
                 return true;
+
             case R.id.help:
-                return true;
+                Intent i2 = new Intent(getApplicationContext(), HelpActivity.class);
+                startActivity(i2);
+                break;
+
             case R.id.search:
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+        return super.onOptionsItemSelected(item);
     }
 }

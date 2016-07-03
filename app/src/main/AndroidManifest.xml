@@ -23,6 +23,10 @@
                 android:value=".MainActivity" />
 
         </activity>
+
+        <activity android:name=".HelpActivity"
+            android:parentActivityName=".MainActivity"/>
+
     </application>
 
 </manifest>

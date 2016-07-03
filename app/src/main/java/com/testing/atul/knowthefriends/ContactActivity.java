@@ -48,7 +48,10 @@ public class ContactActivity extends AppCompatActivity {
 
 
         dbHelper = new DatabaseWorker(getApplicationContext());
-        sno = dbHelper.getSno(oldname);
+        if(!oldname.equals(""))
+            sno = dbHelper.getSno(oldname);
+        else
+            sno = -1;
 
         saveBtn.setOnClickListener(new View.OnClickListener()
         {   @Override
@@ -83,7 +86,8 @@ public class ContactActivity extends AppCompatActivity {
         }
         else {
             try{
-                Bitmap b = icon.getDrawingCache(false);
+                dbHelper = new DatabaseWorker(getApplicationContext());
+                Bitmap b = ((BitmapDrawable)icon.getDrawable()).getBitmap();
                 dbHelper.insertRec(nameBox.getText().toString(), numberBox.getText().toString(), b);
                 Toast.makeText(getApplicationContext(), "Person Inserted", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);

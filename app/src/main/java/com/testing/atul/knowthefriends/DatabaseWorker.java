@@ -70,7 +70,12 @@ public class DatabaseWorker extends SQLiteOpenHelper{
     public boolean insertRec(String name, String num, Bitmap bm){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues vals = new ContentValues();
+        Cursor cursor = db.query(TABLE_NAME, new String[] { "Sno",
+                        "Name", "Number" }, null, null, null, null, null, null);
+        if(cursor != null) cursor.moveToLast();
+        int newsno = Integer.parseInt(cursor.getString(0))+1;
 
+        vals.put("Sno", newsno);
         vals.put("Name", name);
         vals.put("Number", num);
 
