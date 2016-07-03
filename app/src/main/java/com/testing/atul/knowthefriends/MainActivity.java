@@ -3,12 +3,19 @@ package com.testing.atul.knowthefriends;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     String[] nums;
     ArrayList<String> names1 = new ArrayList<>();
     ArrayList<String> nums1 = new ArrayList<>();
-    Integer[] pics = {R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e, R.drawable.a};
+    Bitmap[] pics2 = new Bitmap[10];
 
     DatabaseWorker con = new DatabaseWorker(this);
     SQLiteDatabase condb;
@@ -39,7 +46,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(getApplicationContext(), ContactActivity.class);
                 i.putExtra("name", names[position]);
                 i.putExtra( "number", nums[position]);
-                i.putExtra( "picture", pics[position]);
+
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                pics2[position].compress(Bitmap.CompressFormat.PNG, 100, bos);
+                byte[] picSend = bos.toByteArray();
+                i.putExtra( "picture", picSend);
                 startActivity(i);
                 populate();
             }
@@ -52,23 +63,49 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = condb.rawQuery("SELECT * FROM Contacts", null);
         cursor.moveToFirst();
         int ctr = con.numberOfRows();
+        int z = 0;
 
         do{
             String xname = cursor.getString(cursor.getColumnIndex("Name"));
             names1.add(xname);
             String xnum = cursor.getString(cursor.getColumnIndex("Number"));
             nums1.add(xnum);
+            byte[] xpic = cursor.getBlob(cursor.getColumnIndex("Photo"));
+            pics2[z] = BitmapFactory.decodeByteArray(xpic,0, xpic.length); z++;
+
         }while(cursor.moveToNext());
 
         names=names1.toArray(new String[ctr]);
         nums=nums1.toArray(new String[ctr]);
 
-        CustomListAdapter adapter = new CustomListAdapter(this, names, nums, pics);
+        CustomListAdapter adapter = new CustomListAdapter(this, names, nums, pics2);
         contactList = (ListView)findViewById(R.id.listView);
         assert contactList != null;
         contactList.setAdapter(adapter);
 
         condb.close();
         con.close();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.add:
+                return true;
+            case R.id.help:
+                return true;
+            case R.id.search:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,6 +16,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import java.io.ByteArrayInputStream;
 
 public class ContactActivity extends AppCompatActivity {
 
@@ -38,7 +42,10 @@ public class ContactActivity extends AppCompatActivity {
         oldname=i.getStringExtra("name");
         nameBox.setText(oldname);
         numberBox.setText(i.getStringExtra("number"));
-        icon.setImageResource(i.getIntExtra("picture", R.mipmap.ic_launcher));
+        byte[] recPic = i.getByteArrayExtra("picture");
+        ByteArrayInputStream bis = new ByteArrayInputStream(recPic);
+        icon.setImageBitmap(BitmapFactory.decodeStream(bis));
+
 
         dbHelper = new DatabaseWorker(getApplicationContext());
         sno = dbHelper.getSno(oldname);
@@ -62,7 +69,8 @@ public class ContactActivity extends AppCompatActivity {
         if(sno > 0) {
             try
             {   dbHelper = new DatabaseWorker(getApplicationContext());
-                dbHelper.updateRec(sno, nameBox.getText().toString(), numberBox.getText().toString());
+                Bitmap b = ((BitmapDrawable)icon.getDrawable()).getBitmap();
+                dbHelper.updateRec(sno, nameBox.getText().toString(), numberBox.getText().toString(), b);
                 Toast.makeText(getApplicationContext(), "Person Update Successful", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -75,7 +83,8 @@ public class ContactActivity extends AppCompatActivity {
         }
         else {
             try{
-                dbHelper.insertRec(nameBox.getText().toString(), numberBox.getText().toString());
+                Bitmap b = icon.getDrawingCache(false);
+                dbHelper.insertRec(nameBox.getText().toString(), numberBox.getText().toString(), b);
                 Toast.makeText(getApplicationContext(), "Person Inserted", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.graphics.Bitmap;
 
 /**
  * Created by Atul on 6/29/2016.
@@ -16,9 +17,9 @@ public class CustomListAdapter extends ArrayAdapter<String> {
     private final Activity context;
     private final String[] itemname;
     private final String[] itemnum;
-    private final Integer[] imgid;
+    private final Bitmap[] imgid;
 
-    public CustomListAdapter(Activity context, String[] itemname, String[] itemnum, Integer[] imgid) {
+    public CustomListAdapter(Activity context, String[] itemname, String[] itemnum, Bitmap[] imgid) {
         super(context, R.layout.list_row, itemname);
 
         this.context=context;
@@ -36,7 +37,7 @@ public class CustomListAdapter extends ArrayAdapter<String> {
         TextView number = (TextView) rowView.findViewById(R.id.number_list);
 
         name.setText(itemname[position]);
-        photo.setImageResource(imgid[position%5]);
+        photo.setImageBitmap(imgid[position]);
         number.setText(itemnum[position]);
         return rowView;
 
