@@ -3,4 +3,6 @@
     <string name="help">Select the contact in the List to edit it.\n\n
         In the edit screen, you can change the name and number through the textbox, and you can click the image to select a new one from gallery.\n
     For adding a contact and searching, you can use the menu options.</string>
+    <string name="searchboxhint">Enter name or Number here</string>
+    <string name="searchbutton">Search</string>
 </resources>

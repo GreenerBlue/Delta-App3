@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     public void populate(){
 
         condb = con.getReadableDatabase();
-        Cursor cursor = condb.rawQuery("SELECT * FROM Contacts", null);
+        Cursor cursor = condb.rawQuery("SELECT * FROM Contacts ORDER BY Name", null);
         cursor.moveToFirst();
         int ctr = con.numberOfRows();
         int z = 0;
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 byte[] picSend = bos.toByteArray();
                 i1.putExtra( "picture", picSend);
                 startActivity(i1);
-                return true;
+                break;
 
             case R.id.help:
                 Intent i2 = new Intent(getApplicationContext(), HelpActivity.class);
@@ -115,7 +115,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.search:
-                return true;
+                Intent i3 = new Intent(getApplicationContext(), SearchActivity.class);
+                startActivity(i3);
+                break;
 
             default:
                 return super.onOptionsItemSelected(item);
