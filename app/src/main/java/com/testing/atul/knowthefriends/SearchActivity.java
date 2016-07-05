@@ -51,6 +51,7 @@ public class SearchActivity extends AppCompatActivity{
 
         condb = con.getReadableDatabase();
         Cursor cur = condb.rawQuery("SELECT * FROM Contacts WHERE Name LIKE ? ORDER BY Name",new String[]{"%"+srchText+"%"});
+        Cursor cur2 = condb.rawQuery("SELECT * FROM Contacts WHERE Number LIKE ? ORDER BY Name",new String[]{"%"+srchText+"%"});
 
         if((cur!=null)&&(cur.getCount()>0)) {
             cur.moveToFirst();
@@ -78,11 +79,41 @@ public class SearchActivity extends AppCompatActivity{
             assert contactList != null;
             contactList.setAdapter(adapter);
         }
+
+        else if((cur2!=null)&&(cur2.getCount()>0)){
+            cur2.moveToFirst();
+            int ctr = con.numberOfRows();
+            int z = 0;
+
+            names1.clear();
+            nums1.clear();
+
+            do{
+                String xname = cur2.getString(cur2.getColumnIndex("Name"));
+                names1.add(xname);
+                String xnum = cur2.getString(cur2.getColumnIndex("Number"));
+                nums1.add(xnum);
+                byte[] xpic = cur2.getBlob(cur2.getColumnIndex("Photo"));
+                pics2[z] = BitmapFactory.decodeByteArray(xpic,0, xpic.length); z++;
+
+            }while(cur2.moveToNext());
+
+            names=names1.toArray(new String[ctr]);
+            nums=nums1.toArray(new String[ctr]);
+
+            CustomListAdapter adapter = new CustomListAdapter(this, names, nums, pics2);
+            contactList = (ListView)findViewById(R.id.srchlistView);
+            assert contactList != null;
+            contactList.setAdapter(adapter);
+
+        }
         else {
             Toast.makeText(getApplicationContext(),"Sorry, the contact "+srchText+" is not found",Toast.LENGTH_SHORT).show();
         }
 
         cur.close();
+        cur2.close();
+        con.close();
         condb.close();
 
     }

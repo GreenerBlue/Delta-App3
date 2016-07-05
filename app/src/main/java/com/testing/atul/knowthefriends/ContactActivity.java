@@ -3,7 +3,6 @@ package com.testing.atul.knowthefriends;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -22,7 +21,7 @@ import java.io.ByteArrayInputStream;
 public class ContactActivity extends AppCompatActivity {
 
     EditText nameBox ,numberBox;
-    Button saveBtn;
+    Button saveBtn, delBtn;
     ImageView icon;
 
     DatabaseWorker dbHelper;
@@ -37,6 +36,7 @@ public class ContactActivity extends AppCompatActivity {
         numberBox = (EditText)findViewById(R.id.numberEt);
         icon = (ImageView)findViewById(R.id.iconIv) ;
         saveBtn = (Button) findViewById(R.id.saveBtn);
+        delBtn = (Button) findViewById(R.id.delBtn);
 
         i = getIntent();
         oldname=i.getStringExtra("name");
@@ -66,6 +66,13 @@ public class ContactActivity extends AppCompatActivity {
             { accessGallery(v); }
         });
 
+        delBtn.setOnClickListener(new View.OnClickListener()
+        {   @Override
+        public void onClick(View v)
+        { delRec(v);
+
+        }
+        });
     }
 
     public void saveRec(View v){
@@ -138,6 +145,17 @@ public class ContactActivity extends AppCompatActivity {
             Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
                     .show();
         }
+
+    }
+
+    public void delRec(View v){
+
+        dbHelper = new DatabaseWorker(getApplicationContext());
+        dbHelper.deleteRec(sno);
+        Toast.makeText(getApplicationContext(), "Person Delete Successful", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
 
     }
 

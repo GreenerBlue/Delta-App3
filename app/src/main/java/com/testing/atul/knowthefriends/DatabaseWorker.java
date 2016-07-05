@@ -124,4 +124,10 @@ public class DatabaseWorker extends SQLiteOpenHelper{
         return Integer.parseInt(cursor.getString(0));
     }
 
+    public void deleteRec(int sno) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, "Sno = ?", new String[]{String.valueOf(sno)});
+        db.close();
+    }
+
 }
